@@ -3,19 +3,14 @@ import numpy as np
 from torch import nn
 from torch.nn import functional as F
 from torch.autograd import Variable
+from pytorch_pra.softmax import model
 
-class LogisticRegression(nn.Module):
-    def __init__(self):
-        super(LogisticRegression,self).__init__()
-        self.lr = nn.Linear(2,3)
+model = model.LogisticRegression()
+checkpoint = torch.load('./softmax_model.pth')
+model.load_state_dict(checkpoint['net'])
 
-    def forward(self,x):
-        x = self.lr(x)
-        x = F.log_softmax(x,dim=1)
-        return x
-
-model = torch.load('./softmax_model.pth')
-
+model.eval()
+print("hello world")
 with open('./test.txt','r') as f:
     data_list = f.readlines()
     #data_list = [i.split('\n')[0] for i in data_list]
@@ -32,14 +27,9 @@ for i in range(len(label)):
     d = torch.Tensor(np.array(data[i]).reshape(1,-1))
     la = torch.Tensor(label[i])
     out = model(d)
-    print(out)
     out = torch.argmax(out,1)
-    print(out)
-    #print(label[i])
-    print(out.data[0]==label[i])
     if(out.data[0]==label[i]):
         correct += 1
-    #print(correct)
 print(correct/len(label))
 
 
